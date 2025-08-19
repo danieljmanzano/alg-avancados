@@ -1,10 +1,11 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <map>
 #include <iomanip>
 #include <cmath>
 #include <tuple>
+#include <queue>
+#include <vector>
 
 using namespace std;
 
@@ -20,23 +21,28 @@ double distancia(const tuple<double, double>& resposta, const tuple<double, doub
     double dlat = lat2 - lat1;
     double dlon = lon2 - lon1;
 
-    // ainda tenho que fazer a formula do barato
+    double a = sqrt(sin(dlat / 2) * sin(dlat / 2) +
+                    cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2));
+    double res = 2 * asin(a) * RAIO_TERRA;
 
-    return 0.0;
+    return res;
 }
 
-void printa(const map<string, double>& tentativas, const tuple<double, double>& resposta) {
+/*void printa(const map<string, double>& tentativas, const tuple<double, double>& resposta) {
     cout << "RANKING" << endl << "-------" << endl;
     int i = 1;
     for (const auto& tentativa : tentativas) {
         printf("%2d. %-20s: %7.3f km\n", i, tentativa.first.c_str(), tentativa.second); // print meio esquisito pra ficar formatado conforme esperado
         i++;
     }
-    
-}
+}*/
 
 int main(void) {
-    map<string, double> tentativas;
+    /* sintaxe da priority queue: <tipo, container, comparação>
+        tipo: par de double e string, onde o primeiro é a distância e o segundo é o nome do jogador
+        container: define como os elementos são armazenados, aqui usando vector
+        comparação: menor distância primeiro (usando greater) - caso fosse usar a ordenação normal, poderia apenas omitir essa parte */
+    priority_queue<pair<double, string>, vector<pair<double, string>>, greater<pair<double, string>>> ranking;
     int jogadores = 0;
     cin >> jogadores;
     tuple<double, double> resposta;
@@ -45,17 +51,15 @@ int main(void) {
     tuple<double, double> tentativa;
     string nome;
     double dist;
-    double melhor = INFINITY;
 
     for (int i = 0; i < jogadores; i++) {
         cin >> nome >> get<0>(tentativa) >> get<1>(tentativa); // 'get<i>' pega o i-ésimo elemento da tupla
         dist = distancia(resposta, tentativa);
-        auto res = tentativas.insert({nome, dist});
+        ranking.push({dist, nome});
 
-        if (dist < melhor) melhor = dist;
-        cout << "> [AVISO] MELHOR PALPITE: " << fixed << setprecision(3) << melhor << "km" << endl;
+        cout << "> [AVISO] MELHOR PALPITE: " << fixed << setprecision(3) << ranking.top().first << "km" << endl;
     }
 
-    printa(tentativas, resposta);
-
+    // printa(tentativas, resposta);
+    // tenho que refazer o print
 }
