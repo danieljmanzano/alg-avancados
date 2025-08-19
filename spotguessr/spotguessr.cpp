@@ -1,7 +1,5 @@
 #include <iostream>
-#include <cstdlib>
 #include <string>
-#include <iomanip>
 #include <cmath>
 #include <tuple>
 #include <queue>
@@ -9,10 +7,15 @@
 
 using namespace std;
 
+/*exercício para simular um jogo de adivinhação de coordenadas geográficas. uso priority queue para ordenar as tentativas
+    o jogador deve tentar adivinhar as coordenadas de um ponto específico
+    a cada tentativa, é informado o nome do jogador, as coordenadas e a distância do ponto correto
+    ao final, é impresso um ranking com os jogadores ordenados pela distância da tentativa correta*/
+
 #define RAIO_TERRA 6371.0 // em km
 
 // distancia calculada pela formula de haversine
-double distancia(const tuple<double, double>& resposta, const tuple<double, double>& tentativa) {
+double distancia(const pair<double, double>& resposta, const pair<double, double>& tentativa) {
     double lat1 = get<0>(resposta) * M_PI / 180.0;
     double lon1 = get<1>(resposta) * M_PI / 180.0;
     double lat2 = get<0>(tentativa) * M_PI / 180.0;
@@ -21,45 +24,46 @@ double distancia(const tuple<double, double>& resposta, const tuple<double, doub
     double dlat = lat2 - lat1;
     double dlon = lon2 - lon1;
 
-    double a = sqrt(sin(dlat / 2) * sin(dlat / 2) +
-                    cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2));
+    double a = sqrt(sin(dlat / 2) * sin(dlat / 2) + cos(lat1) * cos(lat2) * sin(dlon / 2) * sin(dlon / 2));
     double res = 2 * asin(a) * RAIO_TERRA;
 
     return res;
 }
 
-/*void printa(const map<string, double>& tentativas, const tuple<double, double>& resposta) {
-    cout << "RANKING" << endl << "-------" << endl;
-    int i = 1;
-    for (const auto& tentativa : tentativas) {
-        printf("%2d. %-20s: %7.3f km\n", i, tentativa.first.c_str(), tentativa.second); // print meio esquisito pra ficar formatado conforme esperado
-        i++;
-    }
-}*/
-
 int main(void) {
-    /* sintaxe da priority queue: <tipo, container, comparação>
-        tipo: par de double e string, onde o primeiro é a distância e o segundo é o nome do jogador
-        container: define como os elementos são armazenados, aqui usando vector
-        comparação: menor distância primeiro (usando greater) - caso fosse usar a ordenação normal, poderia apenas omitir essa parte */
+    /*sintaxe da priority queue: <tipo, container, comparação>
+        -tipo: par de double e string, onde o primeiro é a distância e o segundo é o nome do jogador
+        -container: define como os elementos são armazenados, aqui usando vector
+        -comparação: menor distância primeiro (usando greater) - caso fosse usar a ordenação normal, poderia apenas omitir essa parte */
     priority_queue<pair<double, string>, vector<pair<double, string>>, greater<pair<double, string>>> ranking;
     int jogadores = 0;
     cin >> jogadores;
-    tuple<double, double> resposta;
-    cin >> get<0>(resposta) >> get<1>(resposta); // resposta correta
+    pair<double, double> resposta;
+    cin >> get<0>(resposta) >> get<1>(resposta); // coordenadas a serem adivinhadas
 
-    tuple<double, double> tentativa;
+    pair<double, double> tentativa;
     string nome;
     double dist;
 
     for (int i = 0; i < jogadores; i++) {
         cin >> nome >> get<0>(tentativa) >> get<1>(tentativa); // 'get<i>' pega o i-ésimo elemento da tupla
-        dist = distancia(resposta, tentativa);
-        ranking.push({dist, nome});
+        dist = distancia(resposta, tentativa); // distancia calculada com base nas tuplas resposta e tentativa
+        ranking.push({dist, nome}); // acrescenta o jogador e a distância na fila
 
-        cout << "> [AVISO] MELHOR PALPITE: " << fixed << setprecision(3) << ranking.top().first << "km" << endl;
+        printf("> [AVISO] MELHOR PALPITE: %.3lfkm\n", ranking.top().first);
     }
 
-    // printa(tentativas, resposta);
-    // tenho que refazer o print
+    cout << endl; 
+    cout << "RANKING" << endl << "-------" << endl;
+    int i = 1;
+    while (!ranking.empty()) {
+        pair<double, string> melhor_jogada = ranking.top();
+        printf("%2d. %-21s: %6.3f km", i, melhor_jogada.second.c_str(), melhor_jogada.first); // print meio esquisto para estar formatado conforme o exercício
+        if (melhor_jogada.first <= 0.050) cout << " [FANTASTICO]";
+        cout << endl;
+        ranking.pop(); // cada iteração retira a melhor tentativa da fila. assim, vai progredindo para printar todas ordenadamente
+        i++;
+    }
+
+    return 0;
 }
