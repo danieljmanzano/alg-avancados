@@ -6,3 +6,6 @@ run:
 
 clean:
 	rm -f teste
+
+zip:
+	zip quitanda.zip quitanda.cpp Makefile
