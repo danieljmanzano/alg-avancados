@@ -12,6 +12,9 @@ typedef struct horario {
         if (h != outra.h) return h < outra.h;
         return m < outra.m;
     }
+    bool operator==(const struct horario& outra) const {
+        return h == outra.h && m == outra.m;
+    }
 } Horario;
 
 typedef struct aluguel {
@@ -45,7 +48,14 @@ void ordena_alugueis(int quant_carros, map<int, vector<Aluguel>> &alugueis) {
     for (int id_carro = 1; id_carro <= quant_carros; id_carro++)
         sort(alugueis[id_carro].begin(), alugueis[id_carro].end(), 
             // lambda para comparar dois alugueis com base no horário de início
-            [](const Aluguel &a, const Aluguel &b) {return a.fim < b.fim;});
+            [](const Aluguel &a, const Aluguel &b) {
+                // se o fim for diferente, ordena pelo fim (teoricamente a ideia primordial desse sort)
+                if (!(a.fim == b.fim)) return a.fim < b.fim;
+                // caso os horários sejam iguais, ordena pelo id do aluguel
+                if (a.inicio == b.inicio && a.fim == b.fim) return a.id_aluguel < b.id_aluguel;
+                // último critério: caso apenas os fins sejam iguais, ordena pelo início 
+                return a.inicio < b.inicio;
+            });
 }
 
 // dados os horários de locação desejados para tal modelo, a função organiza os pedidos de aluguel de acordo com horários
@@ -70,21 +80,11 @@ void aloca_horarios(const vector<Aluguel> &alugueis) {
     }
 }
 
-// função para testar os alugueis lidos (mais pra debug). ultima vez testado ta tudo certo
-void printa_alugueis(const vector<Aluguel> &alugueis) {
-    for (const Aluguel &a : alugueis) {
-        cout << "id_aluguel: " << a.id_aluguel << " ";
-        cout << "inicio: " << a.inicio.h << ":" << a.inicio.m << " ";
-        cout << "fim: " << a.fim.h << ":" << a.fim.m << " ";
-        cout << "id_carro: " << a.id_carro << endl;
-    }
-}
-
 int main(void) {
     int casos_teste;
     int quant_carros;
     int solic_alugueis;
-    map<int, vector<Aluguel>> alugueis; // mapeia id do carro para vetor de alugueis
+    map<int, vector<Aluguel>> alugueis; // mapeia id do carro para vetor de alugueis. funciona quase como uma matriz
 
     cin >> casos_teste;
     for (int i = 0; i < casos_teste; i++) {
