@@ -5,6 +5,11 @@
 
 using namespace std;
 
+/*exercício para usar abordagem de algoritmo guloso
+    dado um vetor de "alugueis" (com id, horário de início e fim, id do carro), aloco o máximo de alugueis possíveis
+    pra isso, ordeno os alugueis de cada carro com base no horário de fim
+    depois, aloco aqueles que não se sobrepõem*/
+
 typedef struct horario {
     int h, m; // horas, minutos
 
