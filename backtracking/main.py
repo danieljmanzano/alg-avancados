@@ -1,13 +1,3 @@
-"""
--- Trabalho 1 da matéria --
-Basicamente, um caça-palavras onde devo usar uma trie para armazenar as palavras (a serem achadas) e depois buscar no grid.
-Uma trie é uma árvore usada, geralmente, para armazenar strings (palavras, nesse caso).
-
-O backtracking em questão, que era o tema principal do trabalho, fica meio disfarcado. Mas, resumidamente, ele fica no processo de 
-buscar as palavras no grid, em que vou em todas as direções possíveis a partir de uma posição no grid. Caso um "caminho" não leve a 
-uma palavra, volta e tenta outro caminho (outra direção) e repete isso para todas as letras do caça-palavras.
-"""
-
 from Trie import Trie
 
 # possíveis direções em que se analisa o grid. lados e diagonais, para frente e trás

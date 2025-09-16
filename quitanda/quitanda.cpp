@@ -5,10 +5,6 @@
 
 using namespace std;
 
-/*exercício simples para simular uma quitanda usando map
-    registro certos produtos que tem um preço associado ao proprio peso e o código respectivo
-    depois de inserir todos, posso fazer compras. informo o código e o peso que quero comprar*/
-
 // explicando como funciona o argumento (comentários para eu mesmo entender posteriormente):
 //   const garante que não haverá modificações em produtos. usar o "&" é quase o mesmo que usar ponteiro pelo que entendi
 void compras(const map<string, float>& produtos) {

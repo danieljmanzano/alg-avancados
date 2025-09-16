@@ -1,8 +1,3 @@
-"""
-exercício para verificar quantas pessoas em uma árvore genealógica têm diabetes hereditária.
-faço isso simulando uma árvore usando um dicionário de "Pessoa" (que, contendo os ids de pai e mãe, funciona como o nó de uma árvore)
-"""
-
 class Pessoa:
     def __init__(self, id=-1, pai=-1, mae=-1, tem_diabetes=False):
         self.id = id

@@ -5,11 +5,6 @@
 
 using namespace std;
 
-/*exercício para usar uma abordagem de algoritmo guloso
-    entra um vetor de datas e valores (lucros)
-    devo encontrar a menor combinação de dias que ultrapasse o valor dos demais somados (basicamente, fico pegando o maior valor)
-    ordena o vetor resultante dessa combinação com base nas datas e printa*/
-
 typedef struct data {
     int ano;
     int mes;

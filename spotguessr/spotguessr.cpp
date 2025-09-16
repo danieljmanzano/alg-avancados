@@ -7,11 +7,6 @@
 
 using namespace std;
 
-/*exercício para simular um jogo de adivinhação de coordenadas geográficas. uso priority queue para ordenar as tentativas
-    o jogador deve tentar adivinhar as coordenadas de um ponto específico
-    a cada tentativa, é informado o nome do jogador, as coordenadas e a distância do ponto correto
-    ao final, é impresso um ranking com os jogadores ordenados pela distância da tentativa correta*/
-
 #define RAIO_TERRA 6371.0 // em km
 
 // distancia calculada pela formula de haversine
