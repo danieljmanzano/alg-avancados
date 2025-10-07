@@ -1,4 +1,6 @@
 # como, por algum motivo, o runcodes não aceita zip nesse trabalho, esse código é só uma junção dos outros arquivos
+# não me dei o trabalho de repassar todos os comentários para cá, então ficou meio confuso... para melhor entendimento, ver os outros arquivos
+# à propósito, também para adequar ao runcodes, tem muita maracutaia aqui para conseguir printar na ordem de entrada (diferente do exigido no pdf)
 
 """
 main.py -----------------------------------------------------------------------------------------------------------------------------
@@ -7,10 +9,13 @@ class sistema:
     x: float
     y: float
     nome: str
-    def __init__(self, nome, x, y):
+    index: int # campo usado unicamente para printar os sistemas conforme foram lidos
+               # apesar de o pdf apresentar que a ordem deveria ser alfabética, parece que o esperado é por ordem de entrada...
+    def __init__(self, nome, x, y, index):
         self.nome = nome
         self.x = x
         self.y = y
+        self.index = index
         
 
 def main():
@@ -22,7 +27,7 @@ def main():
 
         for j in range(n_total):
             nome, x, y = input().split()
-            sistemas.append(sistema(nome, float(x), float(y)))
+            sistemas.append(sistema(nome, float(x), float(y), j))
             if j < n_importantes:
                 sistemas_imp.append(sistemas[-1])
 
@@ -84,22 +89,25 @@ def malha_de_tuneis(sistemas_importantes, tensao_max):
 
     nomes_sistemas = [s.nome for s in sistemas_importantes]
     dsu = UnionFind(nomes_sistemas)
-    tunnels_selecionados = []
+    tuneis_selecionados = []
     
     for tensao, nome1, nome2 in arestas:
         if dsu.union(nome1, nome2):
-            tunnels_selecionados.append((nome1, nome2, tensao))
+            tuneis_selecionados.append((nome1, nome2, tensao))
             
-            if len(tunnels_selecionados) == V - 1:
+            if len(tuneis_selecionados) == V - 1:
                 break
 
     output = []
-    for nome1, nome2, tensao in tunnels_selecionados:
-        s1, s2 = sorted([nome1, nome2])
-        output.append(f"{s1}, {s2}, {tensao:.2f}")
+    sistema_map = {s.nome: s for s in sistemas_importantes} 
+    for nome1, nome2, tensao in tuneis_selecionados:
+        s1 = sistema_map[nome1]
+        s2 = sistema_map[nome2]
+        if s1.index < s2.index: output.append(f"{s1.nome}, {s2.nome}, {tensao:.2f}")
+        else: output.append(f"{s2.nome}, {s1.nome}, {tensao:.2f}")
 
     print('\n'.join(output))
-    return tunnels_selecionados
+    return tuneis_selecionados
 
 """
 diveconq.py -------------------------------------------------------------------------------------------------------------------------
@@ -112,9 +120,20 @@ def forca_bruta(pontos):
     for i in range(N):
         for j in range(i + 1, N):
             dist = calcular_tensao(pontos[i], pontos[j])
+            
+            p_atual_i, p_atual_j = pontos[i], pontos[j]
+            if p_atual_i.index > p_atual_j.index:
+                p_atual_i, p_atual_j = p_atual_j, p_atual_i
+            
             if dist < min_dist:
                 min_dist = dist
-                melhor_par = (pontos[i], pontos[j])
+                melhor_par = (p_atual_i, p_atual_j)
+            elif dist == min_dist:
+                if p_atual_i.index < melhor_par[0].index:
+                    melhor_par = (p_atual_i, p_atual_j)
+                elif p_atual_i.index == melhor_par[0].index:
+                    if p_atual_j.index < melhor_par[1].index:
+                        melhor_par = (p_atual_i, p_atual_j)
                 
     return min_dist, melhor_par
 
@@ -131,9 +150,20 @@ def faixa_central(pontos_faixa_ordenados_y, delta, par_minimo_atual):
                 break
             
             dist = calcular_tensao(p1, p2)
+            
+            p_novo1, p_novo2 = p1, p2
+            if p_novo1.index > p_novo2.index:
+                p_novo1, p_novo2 = p_novo2, p_novo1
+
             if dist < min_dist:
                 min_dist = dist
-                melhor_par = (p1, p2)
+                melhor_par = (p_novo1, p_novo2)
+            elif dist == min_dist:
+                if p_novo1.index < melhor_par[0].index:
+                    melhor_par = (p_novo1, p_novo2)
+                elif p_novo1.index == melhor_par[0].index:
+                    if p_novo2.index < melhor_par[1].index:
+                        melhor_par = (p_novo1, p_novo2)
 
     return min_dist, melhor_par
 
@@ -156,9 +186,16 @@ def closest_pair_recursive(Px, Py):
     if delta_L < delta_R:
         delta = delta_L
         par_minimo = par_L
-    else:
+    elif delta_R < delta_L:
         delta = delta_R
         par_minimo = par_R
+    else:
+        if par_L[0].index < par_R[0].index:
+            delta = delta_L
+            par_minimo = par_L
+        else:
+            delta = delta_R
+            par_minimo = par_R
 
     Sy = [p for p in Py if abs(p.x - linha_central_x) < delta]
 
@@ -172,14 +209,11 @@ def ponto_de_ressonancia(sistemas_totais):
     Py = sorted(sistemas_totais, key=lambda p: p.y)
 
     min_dist, (p1, p2) = closest_pair_recursive(Px, Py)
-
-    id1, id2 = sorted([p1.nome, p2.nome])
     
     print("Ponto de Ressonância:", end=' ')
-    print(f"{id1}, {id2}, {min_dist:.2f}")
+    print(f"{p1.nome}, {p2.nome}, {min_dist:.2f}")
 
-    return min_dist, id1, id2
-
+    return min_dist, p1.nome, p2.nome
 
 
 if __name__ == "__main__":
