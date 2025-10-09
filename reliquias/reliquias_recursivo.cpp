@@ -1,5 +1,5 @@
-/* versão recursiva do código pro problema. não roda casos muito grandes do runcodes, então tem outra versão pra isso em reliquias.c */
-/* teoricamente, essa versão é "mais correta" (ou pelo menos mais intuitiva) */
+/* versão recursiva do código pro problema. não roda casos muito grandes do runcodes, então tem outra versão pra isso em reliquias.cpp */
+/* teoricamente, essa versão é "mais correta" (ou pelo menos mais intuitiva). a outra é mais concisa e linear (mas meio confuso de se pensar) */
 
 #include <iostream>
 #include <vector>

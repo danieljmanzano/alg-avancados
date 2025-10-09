@@ -1,66 +1,45 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <algorithm>
+
 using namespace std;
 
-struct State {
-    int i, f;
-    long long d;
-    
-    bool operator==(const State& o) const {
-        return i == o.i && f == o.f && d == o.d;
-    }
+struct Reliquia {
+    long long peso;
+    long long aqp; // custo acumulado quebrando depois 
+    long long aqd; // custo acumulado quebrando primeiro 
 };
-
-struct StateHash {
-    size_t operator()(const State& s) const {
-        return ((size_t)s.i << 40) ^ ((size_t)s.f << 20) ^ (size_t)min(s.d, 100000LL);
-    }
-};
-
-int n;
-vector<long long> s;
-unordered_map<State, long long, StateHash> memo;
-
-long long solve(int i, int f, long long d) {
-    if (i > f) return 0;
-    
-    State st = {i, f, d};
-    auto it = memo.find(st);
-    if (it != memo.end()) return it->second;
-    
-    long long e = s[i] - d;
-    if (e <= 0) {
-        long long res = solve(i + 1, f, 1);
-        memo[st] = res;
-        return res;
-    }
-    
-    long long r = 1e18;
-    for (int j = i; j <= f; j++) {
-        long long ej = s[j] - (j == i ? d : 0);
-        if (ej <= 0) continue;
-        
-        long long c = ej;
-        if (j > i) {
-            c += solve(i, j - 1, d);
-            if (c >= r) continue;
-        }
-        if (j < f) c += solve(j + 1, f, j - i + 1);
-        r = min(r, c);
-    }
-    
-    memo[st] = r;
-    return r;
-}
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
+    int n;
     cin >> n;
-    s.resize(n);
-    for (int i = 0; i < n; i++) cin >> s[i];
-    cout << solve(0, n - 1, 0) << "\n";
+
+    vector<Reliquia> reliquias(n);
+    for (int i = 0; i < n; i++) {
+        cin >> reliquias[i].peso;
+    }
+    
+    // caso base para a primeira relíquia (índice 0)
+    reliquias[0].aqp = reliquias[0].peso;
+    reliquias[0].aqd = reliquias[0].peso;
+
+    // itera da segunda relíquia em diante (base para o topo)
+    for (int i = 1; i < n; i++) {
+        Reliquia& atual = reliquias[i];
+        const Reliquia& anterior = reliquias[i - 1];
+
+        // transição para 'aqp' (quebrar a relíquia atual depois do pilar de baixo)
+        atual.aqp = atual.peso + min(anterior.aqp, anterior.aqd);
+
+        // transição para 'aqd' (quebrar a relíquia atual primeiro, causando queda no pilar de baixo)
+        long long custo_se_ant_era_aqp = anterior.aqp + max(0LL, atual.peso - i);
+        long long custo_se_ant_era_aqd = anterior.aqd + max(0LL, atual.peso - 1);
+        
+        atual.aqd = min(custo_se_ant_era_aqp, custo_se_ant_era_aqd);
+    }
+    
+    // a resposta final é o melhor custo para a última relíquia (o pilar inteiro)
+    cout << min(reliquias[n - 1].aqp, reliquias[n - 1].aqd) << endl;
+
     return 0;
 }
