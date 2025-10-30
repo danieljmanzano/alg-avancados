@@ -12,7 +12,7 @@ def soma_total(i, j, somas_prefixas):
 
 # função recursiva para resolver o problema usando força bruta
 def resolver_forca_bruta(pedras, i, j, somas_prefixas):
-    # Caso base: não há mais pedras para escolher
+    # caso base: não há mais pedras para escolher
     if i > j:
         return 0
 
