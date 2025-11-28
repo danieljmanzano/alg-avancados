@@ -6,7 +6,7 @@ import utils
 def resolver_labirinto(grid):
     pos_atual = (0, 0)
     pos_final = (len(grid) - 1, len(grid) - 1)
-    pontuacao = 0 # pontuação inicializa com 0 e é atualizada a cada passo
+    pontuacao = grid[0][0] # pontuação inicial na posição (0,0)
 
     utils.limpar_tela()
     print(f"Início! Pontuação: {pontuacao}")
